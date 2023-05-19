@@ -1,7 +1,7 @@
 const socket = require("socket.io");
 const express = require("express");
 const cors = require("cors");
-const { print } = require('pdf-to-printer');
+const { print, getDefaultPrinter } = require('pdf-to-printer');
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -39,7 +39,6 @@ const io = socket(server);
 io.sockets.on("connection", (socket) => {
   console.log("new connection id: ", socket.id);
   sendData(socket);
-  sendIPAddress(socket);
 });
 
 function sendData(socket) {
@@ -48,16 +47,17 @@ function sendData(socket) {
   });
 }
 
-function sendIPAddress(socket) {
-  socket.emit("ip_address", IP_ADDRESS);
-}
-
 function printPdfFromUrl(pdfUrl) {
-  print(pdfUrl)
+  getDefaultPrinter().then(data => {
+    console.log(data);
+    print(pdfUrl, {printer: data.deviceId, pages: "1"})
     .then(() => {
       console.log('PDF printed successfully');
     })
     .catch((error) => {
       console.error('Error printing PDF:', error);
     });
+  })
+  console.log("pdfUrl: ", pdfUrl)
+  
 }
