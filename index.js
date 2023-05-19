@@ -1,7 +1,7 @@
 const socket = require("socket.io");
 const express = require("express");
 const cors = require("cors");
-const { print, getDefaultPrinter } = require('pdf-to-printer');
+const { printFile, getPrinters } = require('node-printer');
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -41,23 +41,23 @@ io.sockets.on("connection", (socket) => {
   sendData(socket);
 });
 
-function sendData(socket) {
-  socket.on("print_data", (data) => {
-    printPdfFromUrl(data);
+async function sendData(socket) {
+  socket.on("print_data", async (data) => {
+    try {
+      await printPdfFromUrl(data);
+      console.log('PDF printed successfully');
+    } catch (error) {
+      console.error('Error printing PDF:', error);
+    }
   });
 }
 
-function printPdfFromUrl(pdfUrl) {
-  getDefaultPrinter().then(data => {
-    console.log(data);
-    print(pdfUrl, {printer: data.deviceId, pages: "1"})
-    .then(() => {
-      console.log('PDF printed successfully');
-    })
-    .catch((error) => {
-      console.error('Error printing PDF:', error);
-    });
-  })
-  console.log("pdfUrl: ", pdfUrl)
-  
+async function printPdfFromUrl(pdfUrl) {
+  const printers = await getPrinters();
+  if (printers.length === 0) {
+    throw new Error('No printers available');
+  }
+
+  const printerName = printers[0].name; // Use the first available printer
+  await printFile({ filename: pdfUrl, printer: printerName });
 }
