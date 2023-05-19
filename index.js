@@ -1,7 +1,7 @@
 const socket = require("socket.io");
 const express = require("express");
 const cors = require("cors");
-const { printFile, getPrinters } = require('node-printer');
+const { printDirect } = require('printer');
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -53,11 +53,15 @@ async function sendData(socket) {
 }
 
 async function printPdfFromUrl(pdfUrl) {
-  const printers = await getPrinters();
-  if (printers.length === 0) {
-    throw new Error('No printers available');
+  const printerName = getDefaultPrinter();
+  if (!printerName) {
+    throw new Error('No default printer found');
   }
 
-  const printerName = printers[0].name; // Use the first available printer
-  await printFile({ filename: pdfUrl, printer: printerName });
+  const options = {
+    printer: printerName,
+    unix: ['-o', 'fit-to-page'] // Adjust print options as needed
+  };
+
+  printDirect(options, pdfUrl);
 }
