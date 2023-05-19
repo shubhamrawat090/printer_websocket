@@ -2,6 +2,9 @@ const socket = require("socket.io");
 const express = require("express");
 const cors = require("cors");
 const { print } = require('pdf-to-printer');
+const fetch = require('node-fetch');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -53,6 +56,17 @@ async function sendData(socket) {
 }
 
 async function printPdfFromUrl(pdfUrl) {
-  const printer = await print(pdfUrl);
-  console.log('PDF printed on printer:', printer);
+  const response = await fetch(pdfUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to download PDF: ${response.status} ${response.statusText}`);
+  }
+
+  const pdfBuffer = await response.buffer();
+  const tempFilePath = path.join(__dirname, 'temp.pdf');
+
+  fs.writeFileSync(tempFilePath, pdfBuffer);
+
+  await print(tempFilePath);
+  
+  fs.unlinkSync(tempFilePath);
 }
