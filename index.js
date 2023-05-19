@@ -2,7 +2,7 @@ const socket = require("socket.io");
 const express = require("express");
 const cors = require("cors");
 const { print } = require('pdf-to-printer');
-const fetch = require('node-fetch');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
@@ -56,12 +56,12 @@ async function sendData(socket) {
 }
 
 async function printPdfFromUrl(pdfUrl) {
-  const response = await fetch(pdfUrl);
-  if (!response.ok) {
+  const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
+  if (!response.status === 200) {
     throw new Error(`Failed to download PDF: ${response.status} ${response.statusText}`);
   }
 
-  const pdfBuffer = await response.buffer();
+  const pdfBuffer = response.data;
   const tempFilePath = path.join(__dirname, 'temp.pdf');
 
   fs.writeFileSync(tempFilePath, pdfBuffer);
