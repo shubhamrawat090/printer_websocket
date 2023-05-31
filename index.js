@@ -14,6 +14,7 @@ socket.on("connect", () => {
 
 socket.on("get_printer_system", async (pdfUrl) => {
   try {
+    console.log("PDF Url: ", pdfUrl);
     // Download the PDF from pdfUrl
     const response = await axios.get(pdfUrl, { responseType: "arraybuffer" });
     const pdfBuffer = response.data;
