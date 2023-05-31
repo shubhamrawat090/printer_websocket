@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "build": "ncc build  -o build/lib ./index.js && pkg --targets node16-win-x64 -o build/printerSocket.exe ./build/lib/index.js" 
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vercel/ncc": "^0.36.1",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
