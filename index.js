@@ -1,13 +1,12 @@
 const io = require("socket.io-client");
 const axios = require("axios");
 const fs = require("fs");
-const { print, getDefaultPrinter } = require("pdf-to-printer");
+const { print } = require("pdf-to-printer");
 
 const socket = io("https://samasya.tech");
 
 socket.on("connect", () => {
   console.log("Connected to backend socket");
-  getDefaultPrinter().then(res => console.log("default printer: ", res))
 
   // Join the "printer_system" room
   socket.emit("printer_socket_room", "printer_system");
@@ -38,7 +37,6 @@ socket.on("get_printer_system", async (pdfUrl) => {
     else {
       await print(tempFilePath)
     }
-
 
     // Delete the temporary file
     fs.unlinkSync(tempFilePath);
