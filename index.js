@@ -24,13 +24,21 @@ socket.on("get_printer_system", async (pdfUrl) => {
     const tempFilePath = "./temp.pdf";
     fs.writeFileSync(tempFilePath, pdfBuffer);
 
-    // Print the PDF
-    const options = {
-      printer: "iDPRT SP410",
-      scale: "fit",
-      paperSize: `3.25"x5.83"(8.26cm x 14.81cm)`
+    // For amazon labels -> resize the content a/c to label paper size
+    if(pdfUrl.endsWith("amazon.pdf")) {
+      // Print the PDF
+      const options = {
+        printer: "iDPRT SP410",
+        scale: "fit",
+        paperSize: `3.25"x5.83"(8.26cm x 14.81cm)`
+      }
+      await print(tempFilePath, options)
+    } 
+    // For other labels -> just print as it is
+    else {
+      await print(tempFilePath)
     }
-    await print(tempFilePath, options)
+
 
     // Delete the temporary file
     fs.unlinkSync(tempFilePath);
