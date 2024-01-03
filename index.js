@@ -2,6 +2,7 @@ const io = require("socket.io-client");
 const axios = require("axios");
 const fs = require("fs");
 const { print } = require("pdf-to-printer");
+const { PDFDocument, degrees } = require("pdf-lib");
 
 const socket = io("https://samasya.tech");
 
@@ -19,9 +20,19 @@ socket.on("get_printer_system", async (pdfUrl) => {
     const response = await axios.get(pdfUrl, { responseType: "arraybuffer" });
     const pdfBuffer = response.data;
 
-    // Save the PDF to a temporary file
+    // Create a PDF document from the downloaded buffer
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+    // Rotate all pages in the document by 180 degrees
+    const pages = pdfDoc.getPages();
+    pages.forEach((page) => {
+      page.setRotation(degrees(180));
+    });
+
+    // Save the rotated PDF to a temporary file
     const tempFilePath = "./temp.pdf";
-    fs.writeFileSync(tempFilePath, pdfBuffer);
+    const modifiedPdfBuffer = await pdfDoc.save();
+    fs.writeFileSync(tempFilePath, modifiedPdfBuffer);
 
     // Print the PDF
     const options = {

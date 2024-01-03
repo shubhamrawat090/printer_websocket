@@ -18,11 +18,12 @@
     "fs": "0.0.1-security",
     "nodemon": "^2.0.22",
     "path": "^0.12.7",
+    "pdf-lib": "^1.17.1",
+    "pdf-to-printer": "^5.6.0",
     "socket.io-client": "^4.6.1"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.36.1",
-    "pdf-to-printer": "^5.6.0",
     "pkg": "^5.8.1"
   }
 }
